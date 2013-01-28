@@ -2,25 +2,53 @@
 ; --------
 ; Global settings and flags
 ;
+
 [yummie]
+
+; Debug level in yum, for help, see `man yum`
 debuglevel      = 0
+
 ; Be verbose, default: no
 ; If not enabled, yummie will try to be as quiet as possible
-verbose         = yes
+verbose         = no
+
 ; Do upgrade, default: no
 ; If not enabled, yummie will do no actual upgrades
 upgrade         = yes
+
 ; Use sudo, default: no
 ; If not enabled, yummie will fail to do upgrades if not executed as root
 sudo            = no
+
 
 ; bin
 ; ---
 ; Paths to binaries
 ;
+
 [bin]
+
 sudo            = /usr/bin/sudo
 yum             = /usr/bin/yum
+
+; log
+; ---
+; Logging options
+;
+
+[log]
+
+; Log method, either syslog, file or stderr
+method          = syslog
+
+; File options
+file.filename   = test.log
+; File size maximum (in MB)
+file.filesize   = 100
+
+; Syslog options
+syslog.address  = /dev/log
+syslog.facility = daemon
 
 ; package
 ; -------
@@ -31,6 +59,7 @@ yum             = /usr/bin/yum
 ;
 ; Mind that the keys configured here have to be unique.
 ;
+
 [package]
 exclude.apache  = httpd*
 
@@ -43,9 +72,10 @@ exclude.apache  = httpd*
 ;
 ; Mind that the keys configured here have to be unique.
 ;
+
 [repository]
-exclude.custom  = custom-*
-exclude.epel    = epel*
-exclude.mysql   = mysql*
+exclude.custom = custom-*
+exclude.epel   = epel*
+exclude.mysql  = mysql*
 
 ; vim:ft=ini
