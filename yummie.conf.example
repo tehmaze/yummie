@@ -1,0 +1,51 @@
+; yummie
+; --------
+; Global settings and flags
+;
+[yummie]
+debuglevel      = 0
+; Be verbose, default: no
+; If not enabled, yummie will try to be as quiet as possible
+verbose         = yes
+; Do upgrade, default: no
+; If not enabled, yummie will do no actual upgrades
+upgrade         = yes
+; Use sudo, default: no
+; If not enabled, yummie will fail to do upgrades if not executed as root
+sudo            = no
+
+; bin
+; ---
+; Paths to binaries
+;
+[bin]
+sudo            = /usr/bin/sudo
+yum             = /usr/bin/yum
+
+; package
+; -------
+; Package exclusions
+;
+; You can specify strings or globs to match package names. Packages listed here
+; will be excluded from automated upgrades.
+;
+; Mind that the keys configured here have to be unique.
+;
+[package]
+exclude.apache  = httpd*
+
+; repository
+; ----------
+; Repository exclusions
+;
+; You can specify strings or globs to match repository names. Packages in the
+; repositories listed here ; will be excluded from automated upgrades.
+;
+; Mind that the keys configured here have to be unique.
+;
+[repository]
+exclude.custom  = custom-*
+exclude.epel    = epel*
+exclude.mysql   = mysql*
+
+; vim:ft=ini
