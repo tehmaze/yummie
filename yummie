@@ -217,7 +217,7 @@ def run():
         return 0
 
     if not option.upgrade:
-        loggin.info('Skipping upgrades')
+        logging.info('Skipping upgrades')
         return 0
 
     upgrade = yummie.upgrade([update for update, version in yummie.updates])
