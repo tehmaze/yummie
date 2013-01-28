@@ -32,7 +32,7 @@ To prevent packages in the `mysql` repository from upgrading automatically,
 add:
 
     [repository]
-    exclude.mysql   = mysql*
+    exclude.mysql = mysql*
 
 ## Bugs/Features
 
