@@ -124,7 +124,7 @@ class Yummie(object):
         return pipe.returncode, output
 
     def check_updates(self):
-        args = ['--cacheonly', '--debuglevel=%d' % (self.option.debuglevel,)]
+        args = ['-C', '--debuglevel=%d' % (self.option.debuglevel,)]
         args.extend(self._package_args())
         args.extend(self._repository_args())
         args.append('check-update')
