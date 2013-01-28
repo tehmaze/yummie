@@ -50,7 +50,7 @@ class Yummie(object):
 
         elif method == 'file':
             filename = self.config.get('log', 'file.filename')
-            filesize = self.config.getint('log', 'file.filesize') * 1024**2
+            filesize = self.config.getint('log', 'file.filesize') * 1024 ** 2
             formats = logging.Formatter('%(asctime)s %(message)s')
             handler = RotatingFileHandler(filename, maxBytes=filesize)
             handler.setLevel(logging.DEBUG)
