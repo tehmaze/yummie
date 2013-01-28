@@ -1,0 +1,4 @@
+#!/bin/bash
+# Executes yummie at 03:17 with 0-15 minutes random splay on a weekly basis
+
+/bin/sleep $[RANDOM%300] && /usr/bin/yummie
