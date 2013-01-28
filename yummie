@@ -208,9 +208,9 @@ def run():
         return 1
 
     if yummie.updates:
-        logging.info('%d packages need updating' % len(yummie.updates))
+        logging.info('%d packages need updating:' % len(yummie.updates))
         for update, version in sorted(yummie.updates):
-            logging.debug('%s %s' % (update, version))
+            logging.debug('    %s %s' % (update, version))
 
     else:
         logging.info('System up to date')
