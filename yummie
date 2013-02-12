@@ -5,6 +5,7 @@ import logging
 from logging.handlers import RotatingFileHandler, SysLogHandler
 import os
 import re
+import shlex
 import subprocess
 import sys
 import textwrap
@@ -154,6 +155,22 @@ class Yummie(object):
         self.updates = []
         return returncode
 
+    def post(self):
+        try:
+            post = self.config.has_option('yummie', 'post')
+        except ConfigParser.NoOptionError:
+            return 0
+
+        logging.info('Running post script: %s' % (post,))
+        pipe = subprocess.Popen(shlex.split(post),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        print pipe.comminicate('\n'.join([
+            ' '.join(line) for line in self.updates
+        ]))
+        return pipe.returncode
+
 
 def run():
     import optparse
@@ -229,7 +246,7 @@ def run():
 
     else:
         logging.debug('Upgrades done')
-        return 0
+        return yummie.post()
 
 
 if __name__ == '__main__':
