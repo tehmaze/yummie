@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 import ConfigParser
+import fnmatch
 import logging
 from logging.handlers import RotatingFileHandler, SysLogHandler
 import os
 import re
-import shlex
 import subprocess
 import string
 import sys
@@ -37,8 +37,16 @@ class Yummie(object):
 
         # stderr of the last command
         self.errors = ''
-        # List of pending package
+        # List of pending packages
         self.updates = []
+        # List of excluded packages
+        self.exclude = set([])
+
+        for option in self.config.options('package'):
+            if option.startswith('exclude'):
+                for package in map(string.strip, self.config.get('package',
+                        option).split(',')):
+                    self.exclude.add(package)
 
     def _setup_logging(self):
         method = self.config.getdefault('log', 'method', 'stderr')
@@ -75,17 +83,9 @@ class Yummie(object):
             raise TypeError('Invalid log method: %s' % method)
 
     def _package_args(self):
-        args = []
-        for option in self.config.options('package'):
-            if option.startswith('exclude'):
-                for package in map(string.strip, self.config.get('package',
-                        option).split(',')):
-                    args.append('--exclude="%s"' % package)
-            else:
-                raise ValueError('Unsupported flag in section package: %s' %
-                                 option)
-
-        return args
+        return ['--exclude="%s"' % ','.join([
+            package for package in self.exclude
+        ])]
 
     def _repository_args(self):
         args = []
@@ -137,12 +137,20 @@ class Yummie(object):
         for line in output.splitlines():
             test = self._re_package.match(line)
             if test:
-                self.updates.append((
-                    test.groupdict()['package'],    # package name
-                    line.split()[1],                # package version
-                ))
+                name = test.groupdict()['package']
+                if not self.excluded(name):
+                    self.updates.append((
+                        name,             # package name
+                        line.split()[1],  # package version
+                    ))
 
-        return returncode
+        return len(self.updates)
+
+    def excluded(self, name):
+        for exclude in self.exclude:
+            if fnmatch.fnmatch(name, exclude):
+                return True
+        return False
 
     def upgrade(self, packages):
         args = ['--debuglevel=%d' % (self.option.debuglevel,)]
@@ -164,11 +172,11 @@ class Yummie(object):
             return 0
 
         logging.info('Running post script: %s' % (post,))
-        pipe = subprocess.Popen(shlex.split(post),
+        pipe = subprocess.Popen([post],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        print pipe.comminicate('\n'.join([
+        print pipe.communicate('\n'.join([
             ' '.join(line) for line in self.updates
         ]))
         return pipe.returncode
