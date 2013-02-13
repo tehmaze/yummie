@@ -21,8 +21,9 @@ upgrade         = yes
 sudo            = no
 
 ; Post script to run after doing upgrades, default: none
-; The post script receives a list of packages via stdin, the return code of the
-; post script will be used as the return code of the yummie run.
+; The post script receives a list of packages in a file as the last argument,
+; the return code of the ; post script will be used as the return code of the
+; yummie run.
 ;post           = /path/to/script
 
 ; bin
