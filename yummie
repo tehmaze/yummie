@@ -169,7 +169,7 @@ class Yummie(object):
 
     def post(self):
         try:
-            post = self.config.has_option('yummie', 'post')
+            post = self.config.get('yummie', 'post')
         except ConfigParser.NoOptionError:
             return 0
 
