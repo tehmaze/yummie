@@ -85,9 +85,7 @@ class Yummie(object):
             raise TypeError('Invalid log method: %s' % method)
 
     def _package_args(self):
-        return ['--exclude="%s"' % ','.join([
-            package for package in self.exclude
-        ])]
+        return ['--exclude="%s"' % ','.join(sorted(self.exclude))]
 
     def _repository_args(self):
         args = []
