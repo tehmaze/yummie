@@ -2,7 +2,7 @@ from distutils.core import setup, Extension
 
 setup(
     name         = 'yummie',
-    version      = '0.1.1',
+    version      = '0.1.3',
     author       = 'Wijnand Modderman-Lenstra',
     author_email = 'maze@pyth0n.org',
     description  = 'Automated yum upgrades',
