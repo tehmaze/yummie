@@ -85,19 +85,18 @@ class Yummie(object):
             raise TypeError('Invalid log method: %s' % method)
 
     def _package_args(self):
-        return ['--exclude="%s"' % ','.join(sorted(self.exclude))]
+        return ['--exclude=%s' % ','.join(sorted(self.exclude))]
 
     def _repository_args(self):
-        args = []
+        repos = []
         for option in self.config.options('repository'):
             if option.startswith('exclude'):
-                args.append('--disablerepo="%s"' %
-                            self.config.get('repository', option))
+                repos.append(self.config.get('repository', option))
             else:
                 raise ValueError('Unsupported flag in section repository: %s' %
                                  option)
 
-        return args
+        return ['--disablerepo=%s' % ','.join(sorted(repos))]
 
     def _yum(self, args=[]):
         command = [
