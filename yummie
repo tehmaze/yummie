@@ -212,8 +212,6 @@ def run():
     config = Config(option.config)
 
     # Parse default options from configuration file
-    if not option.debuglevel and config.has_option('yummie', 'debuglevel'):
-        option.debuglevel = config.getint('yummie', 'debuglevel')
     for flag in ('sudo', 'upgrade', 'verbose'):
         if not getattr(option, flag) and config.has_option('yummie', flag):
             setattr(option, flag, config.getboolean('yummie', flag))
