@@ -126,7 +126,9 @@ class Yummie(object):
         return pipe.returncode, output
 
     def check_updates(self):
-        args = ['-C', '--debuglevel=%d' % (self.option.debuglevel,)]
+        args = []
+        if not self.option.no_cache:
+            args.append('-C')
         args.extend(self._package_args())
         args.extend(self._repository_args())
         args.append('check-update')
@@ -152,7 +154,9 @@ class Yummie(object):
         return False
 
     def upgrade(self, packages):
-        args = ['--debuglevel=%d' % (self.option.debuglevel,)]
+        args = []
+        if not self.option.no_cache:
+            args.append('-C')
         args.extend(self._package_args())
         args.extend(self._repository_args())
         args.append('--obsoletes')
@@ -192,9 +196,8 @@ def run():
     parser.add_option('-c', '--config', default='/etc/yum/yummie.conf',
         metavar='FILENAME',
         help='Configuration file (default: /etc/yum/yummie.conf)')
-    parser.add_option('-d', '--debuglevel', default=-1, type='int',
-        metavar='LEVEL',
-        help='Debug level (default: 0)')
+    parser.add_option('--no-cache', default=False, action='store_true',
+        help='Do not used cached results (default: use cache)')
     parser.add_option('--sudo', default=False, action='store_true',
         help='Use sudo (default: no)')
     parser.add_option('-u', '--upgrade', default=False, action='store_true',
