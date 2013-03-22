@@ -155,8 +155,6 @@ class Yummie(object):
 
     def upgrade(self, packages):
         args = []
-        if not self.option.no_cache:
-            args.append('-C')
         args.extend(self._package_args())
         args.extend(self._repository_args())
         args.append('--obsoletes')
