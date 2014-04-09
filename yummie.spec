@@ -1,5 +1,5 @@
 Name:           yummie
-Version:        0.0.1
+Version:        0.1.7
 Release:        1%{?dist}
 Summary:        Automated system upgrades using yum
 
@@ -39,5 +39,3 @@ fi
 %config(noreplace)/etc/yum/yummie.conf
 
 %changelog
-* Mon Jan 28 2013 Wijnand Modderman-Lenstra <maze@pyth0n.org> - 0.0.1-1
-- initial version
