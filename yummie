@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import atexit
 import ConfigParser
 import fnmatch
 import logging
@@ -12,6 +13,7 @@ import string
 import sys
 import tempfile
 import textwrap
+import time
 
 
 class Config(ConfigParser.ConfigParser):
@@ -202,6 +204,8 @@ def run():
         help='Do upgrade (default: no)')
     parser.add_option('-v', '--verbose', default=False, action='store_true',
         help='Be verbose (default: no)')
+    parser.add_option('--puppetlock', default=False, action='store_true',
+        help="Wait for the puppet lock and acquire it")
 
     # Parse the command line options
     option, args = parser.parse_args()
@@ -210,7 +214,7 @@ def run():
     config = Config(option.config)
 
     # Parse default options from configuration file
-    for flag in ('sudo', 'upgrade', 'verbose'):
+    for flag in ('sudo', 'upgrade', 'verbose', 'puppetlock'):
         if not getattr(option, flag) and config.has_option('yummie', flag):
             setattr(option, flag, config.getboolean('yummie', flag))
 
@@ -223,6 +227,28 @@ def run():
         logger.setLevel(logging.DEBUG)
     else:
         logger.setLevel(logging.INFO)
+
+    # Lock puppet if requested to do so
+    if option.puppetlock:
+        puppetlockfile = '/var/lib/puppet/state/puppetdlock'
+        while os.path.exists(puppetlockfile):
+            logging.info("Waiting for puppet lock")
+            try:
+                fd = open(puppetlockfile, 'r')
+            except IOError:
+                continue
+            pid = fd.read()
+            fd.close()
+            try:
+                os.kill(int(pid), 0)
+            except OSError:
+                # pid doesn't exist, lockfile is stale
+                break
+            time.sleep(2)
+        fd = open(puppetlockfile, 'w')
+        fd.write(str(os.getpid()))
+        fd.close()
+        atexit.register(os.unlink, puppetlockfile)
 
     yummie = Yummie(option, config)
     updates = yummie.check_updates()
@@ -259,7 +285,6 @@ def run():
     else:
         logging.debug('Upgrades done')
         return yummie.post()
-
 
 if __name__ == '__main__':
     sys.exit(run())
