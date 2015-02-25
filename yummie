@@ -120,7 +120,10 @@ class Yummie(object):
             else:
                 logging.debug('    ' + command_text[x])
 
+        env = os.environ.copy()
+        env['COLS'] = '1000'
         pipe = subprocess.Popen(command,
+                                env=env,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE)
 
@@ -137,14 +140,22 @@ class Yummie(object):
 
         returncode, output = self._yum(args)
         self.updates = []
+        prev = []
         for line in output.splitlines():
             test = self._re_package.match(line)
             if test:
                 name = test.groupdict()['package']
+                part = prev + line.split()
+                if len(part) == 1:
+                    prev = part
+                    continue
+                else:
+                    prev = []
+
                 if not self.excluded(name):
                     self.updates.append((
                         name,             # package name
-                        line.split()[1],  # package version
+                        part[1],          # package version
                     ))
 
         return len(self.updates)
