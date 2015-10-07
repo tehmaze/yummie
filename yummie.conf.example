@@ -20,6 +20,14 @@ upgrade         = yes
 ; If not enabled, yummie will fail to do upgrades if not executed as root
 sudo            = no
 
+; Pre script to run before running upgrades, default: none
+; This script is expected to return a list of packages to exclude, one per
+; line.
+;
+; For example:
+; pre           = /usr/bin/jq '.data | .resources[] | select(.type=="Package") | .title ' /var/lib/puppet/client_data/catalog/$(hostname).json
+; pre           = /path/to/script
+
 ; Post script to run after doing upgrades, default: none
 ; The post script receives a list of packages in a file as the last argument,
 ; the return code of the ; post script will be used as the return code of the

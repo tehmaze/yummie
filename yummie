@@ -179,6 +179,23 @@ class Yummie(object):
         self.updates = []
         return returncode
 
+    def pre(self):
+        try:
+            pre = self.config.get('yummie', 'pre')
+        except ConfigParser.NoOptionError:
+            return 0
+
+        logging.info('Running pre script: %s' % (pre))
+        try:
+            args = shlex.split(pre)
+            # Because RedHat 6.x is still on Python 2.6
+            packages = subprocess.Popen(args, stdout=subprocess.PIPE).communicate()[0].split("\n")
+            for package in packages:
+                if package != '':
+                    self.exclude.add(package.strip('"'))
+        except:
+            exit(1)
+
     def post(self):
         try:
             post = self.config.get('yummie', 'post')
@@ -262,6 +279,7 @@ def run():
         atexit.register(os.unlink, puppetlockfile)
 
     yummie = Yummie(option, config)
+    yummie.pre()
     updates = yummie.check_updates()
     if updates == 0:
         logging.info('No updates')
