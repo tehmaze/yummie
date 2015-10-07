@@ -1,5 +1,5 @@
 Name:           yummie
-Version:        0.1.8
+Version:        0.1.9
 Release:        1%{?dist}
 Summary:        Automated system upgrades using yum
 
