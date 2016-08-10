@@ -158,7 +158,7 @@ class Yummie(object):
                         part[1],          # package version
                     ))
 
-        return len(self.updates)
+        return returncode
 
     def excluded(self, name):
         for exclude in self.exclude:
