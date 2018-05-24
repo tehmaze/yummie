@@ -98,7 +98,10 @@ class Yummie(object):
                 raise ValueError('Unsupported flag in section repository: %s' %
                                  option)
 
-        return ['--disablerepo=%s' % ','.join(sorted(repos))]
+        if len(repos) == 0:
+            return ''
+        else:
+            return ['--disablerepo=%s' % ','.join(sorted(repos))]
 
     def _yum(self, args=[]):
         command = [
@@ -258,25 +261,28 @@ def run():
 
     # Lock puppet if requested to do so
     if option.puppetlock:
-        puppetlockfile = '/var/lib/puppet/state/puppetdlock'
-        while os.path.exists(puppetlockfile):
-            logging.info("Waiting for puppet lock")
-            try:
-                fd = open(puppetlockfile, 'r')
-            except IOError:
-                continue
-            pid = fd.read()
+        try:
+            puppetlockfile = config.get('yummie', 'lockfile', '/var/lib/puppet/state/puppetdlock')
+            while os.path.exists(puppetlockfile):
+                logging.info("Waiting for puppet lock")
+                try:
+                    fd = open(puppetlockfile, 'r')
+                except IOError:
+                    continue
+                pid = fd.read()
+                fd.close()
+                try:
+                    os.kill(int(pid), 0)
+                except OSError:
+                    # pid doesn't exist, lockfile is stale
+                    break
+                time.sleep(2)
+            fd = open(puppetlockfile, 'w')
+            fd.write(str(os.getpid()))
             fd.close()
-            try:
-                os.kill(int(pid), 0)
-            except OSError:
-                # pid doesn't exist, lockfile is stale
-                break
-            time.sleep(2)
-        fd = open(puppetlockfile, 'w')
-        fd.write(str(os.getpid()))
-        fd.close()
-        atexit.register(os.unlink, puppetlockfile)
+            atexit.register(os.unlink, puppetlockfile)
+        except ConfigParser.NoOptionError:
+            pass
 
     yummie = Yummie(option, config)
     yummie.pre()
