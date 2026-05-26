@@ -1,36 +1,36 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 import atexit
-import ConfigParser
+import configparser
 import fnmatch
 import logging
-from logging.handlers import RotatingFileHandler, SysLogHandler
 import os
 import re
 import shlex
 import subprocess
-import string
 import sys
 import tempfile
 import textwrap
 import time
+from logging.handlers import RotatingFileHandler, SysLogHandler
 
 
-class Config(ConfigParser.ConfigParser):
+class Config(configparser.ConfigParser):
     def __init__(self, filename):
-        ConfigParser.ConfigParser.__init__(self)
+        super().__init__()
         self.read([filename])
 
     def getdefault(self, section, option, default=None):
         try:
-            return ConfigParser.ConfigParser.get(self, section, option)
-        except ConfigParser.NoOptionError:
+            return super().get(section, option)
+        except configparser.NoOptionError:
             return default
 
 
 class Yummie(object):
-    _re_package = re.compile(r'(?P<package>\S+)\.' +
-                             r'(?P<arch>:i[3-6]86|x86_64|noarch)')
+    _re_package = re.compile(
+        r"(?P<package>\S+)\." + r"(?P<arch>:i[3-6]86|x86_64|noarch)"
+    )
 
     def __init__(self, option, config):
         self.option = option
@@ -40,95 +40,93 @@ class Yummie(object):
         self._setup_logging()
 
         # stderr of the last command
-        self.errors = ''
+        self.errors = ""
         # List of pending packages
         self.updates = []
         # List of excluded packages
         self.exclude = set([])
 
-        for option in self.config.options('package'):
-            if option.startswith('exclude'):
-                for package in map(string.strip, self.config.get('package',
-                        option).split(',')):
+        for option in self.config.options("package"):
+            if option.startswith("exclude"):
+                for package in [
+                    p.strip() for p in self.config.get("package", option).split(",")
+                ]:
                     self.exclude.add(package)
 
     def _setup_logging(self):
-        method = self.config.getdefault('log', 'method', 'stderr')
+        method = self.config.getdefault("log", "method", "stderr")
         logger = logging.getLogger()
 
-        if method == 'stderr':
+        if method == "stderr":
             logging.basicConfig(
                 level=logging.DEBUG,
-                format='%(asctime)s %(message)s',
+                format="%(asctime)s %(message)s",
             )
 
-        elif method == 'file':
-            filename = self.config.get('log', 'file.filename')
-            filesize = self.config.getint('log', 'file.filesize') * 1024 ** 2
-            formats = logging.Formatter('%(asctime)s %(message)s')
+        elif method == "file":
+            filename = self.config.get("log", "file.filename")
+            filesize = self.config.getint("log", "file.filesize") * 1024**2
+            formats = logging.Formatter("%(asctime)s %(message)s")
             handler = RotatingFileHandler(filename, maxBytes=filesize)
             handler.setLevel(logging.DEBUG)
             handler.setFormatter(formats)
             logger.addHandler(handler)
 
-        elif method == 'syslog':
-            address = self.config.getdefault('log', 'syslog.address',
-                                             '/dev/log')
-            facility = self.config.getdefault('log', 'syslog.facility',
-                                              'daemon').lower()
-            formats = logging.Formatter('yummie[%(process)d]: %(message)s')
-            handler = SysLogHandler(address=address,
-                                    facility=facility)
+        elif method == "syslog":
+            address = self.config.getdefault("log", "syslog.address", "/dev/log")
+            facility = self.config.getdefault(
+                "log", "syslog.facility", "daemon"
+            ).lower()
+            formats = logging.Formatter("yummie[%(process)d]: %(message)s")
+            handler = SysLogHandler(address=address, facility=facility)
             handler.setLevel(logging.DEBUG)
             handler.setFormatter(formats)
             logger.addHandler(handler)
 
         else:
-            raise TypeError('Invalid log method: %s' % method)
+            raise TypeError("Invalid log method: %s" % method)
 
     def _package_args(self):
-        return ['--exclude=%s' % ','.join(sorted(self.exclude))]
+        return ["--exclude=%s" % ",".join(sorted(self.exclude))]
 
     def _repository_args(self):
         repos = []
-        for option in self.config.options('repository'):
-            if option.startswith('exclude'):
-                repos.append(self.config.get('repository', option))
+        for option in self.config.options("repository"):
+            if option.startswith("exclude"):
+                repos.append(self.config.get("repository", option))
             else:
-                raise ValueError('Unsupported flag in section repository: %s' %
-                                 option)
+                raise ValueError("Unsupported flag in section repository: %s" % option)
 
         if len(repos) == 0:
-            return ''
+            return ""
         else:
-            return ['--disablerepo=%s' % ','.join(sorted(repos))]
+            return ["--disablerepo=%s" % ",".join(sorted(repos))]
 
     def _yum(self, args=[]):
         command = [
-            self.config.getdefault('bin', 'yum', '/usr/bin/yum'),
-            '--color=never',
+            self.config.getdefault("bin", "yum", "/usr/bin/yum"),
+            "--color=never",
         ]
         if self.option.sudo and os.geteuid() != 0:
-            sudo = self.config.getdefault('bin', 'sudo', '/usr/bin/sudo')
+            sudo = self.config.getdefault("bin", "sudo", "/usr/bin/sudo")
             command.insert(0, sudo)
 
         command.extend(args)
 
         # Debugging
-        logging.debug('Running:')
-        command_text = textwrap.wrap(' '.join(command))
+        logging.debug("Running:")
+        command_text = textwrap.wrap(" ".join(command))
         for x in range(0, len(command_text)):
             if x == 0:
                 logging.debug(command_text[x])
             else:
-                logging.debug('    ' + command_text[x])
+                logging.debug("    " + command_text[x])
 
         env = os.environ.copy()
-        env['COLS'] = '1000'
-        pipe = subprocess.Popen(command,
-                                env=env,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
+        env["COLS"] = "1000"
+        pipe = subprocess.Popen(
+            command, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
 
         output, self.errors = pipe.communicate()
         return pipe.returncode, output
@@ -136,10 +134,10 @@ class Yummie(object):
     def check_updates(self):
         args = []
         if not self.option.no_cache:
-            args.append('-C')
+            args.append("-C")
         args.extend(self._package_args())
         args.extend(self._repository_args())
-        args.append('check-update')
+        args.append("check-update")
 
         returncode, output = self._yum(args)
         self.updates = []
@@ -147,7 +145,7 @@ class Yummie(object):
         for line in output.splitlines():
             test = self._re_package.match(line)
             if test:
-                name = test.groupdict()['package']
+                name = test.groupdict()["package"]
                 part = prev + line.split()
                 if len(part) == 1:
                     prev = part
@@ -156,10 +154,12 @@ class Yummie(object):
                     prev = []
 
                 if not self.excluded(name):
-                    self.updates.append((
-                        name,             # package name
-                        part[1],          # package version
-                    ))
+                    self.updates.append(
+                        (
+                            name,  # package name
+                            part[1],  # package version
+                        )
+                    )
 
         return returncode
 
@@ -173,9 +173,9 @@ class Yummie(object):
         args = []
         args.extend(self._package_args())
         args.extend(self._repository_args())
-        args.append('--obsoletes')
-        args.append('-y')
-        args.append('update')
+        args.append("--obsoletes")
+        args.append("-y")
+        args.append("update")
         args.extend(packages)
 
         returncode, output = self._yum(args)
@@ -184,33 +184,36 @@ class Yummie(object):
 
     def pre(self):
         try:
-            pre = self.config.get('yummie', 'pre')
-        except ConfigParser.NoOptionError:
+            pre = self.config.get("yummie", "pre")
+        except configparser.NoOptionError:
             return 0
 
-        logging.info('Running pre script: %s' % (pre))
+        logging.info("Running pre script: %s" % (pre))
         try:
             args = shlex.split(pre)
-            # Because RedHat 6.x is still on Python 2.6
-            packages = subprocess.Popen(args, stdout=subprocess.PIPE).communicate()[0].split("\n")
+            packages = (
+                subprocess.Popen(args, stdout=subprocess.PIPE, text=True)
+                .communicate()[0]
+                .split("\n")
+            )
             for package in packages:
-                if package != '':
+                if package != "":
                     self.exclude.add(package.strip('"'))
         except:
             exit(1)
 
     def post(self):
         try:
-            post = self.config.get('yummie', 'post')
-        except ConfigParser.NoOptionError:
+            post = self.config.get("yummie", "post")
+        except configparser.NoOptionError:
             return 0
 
-        temp = tempfile.NamedTemporaryFile()
-        logging.info('Running post script: %s %s' % (post, temp.name))
+        temp = tempfile.NamedTemporaryFile(mode="w")
+        logging.info("Running post script: %s %s" % (post, temp.name))
         try:
             for line in self.updates:
-                temp.write(' '.join(line))
-                temp.write('\n')
+                temp.write(" ".join(line))
+                temp.write("\n")
             temp.seek(0)
 
             args = shlex.split(post)
@@ -221,33 +224,56 @@ class Yummie(object):
 
 
 def run():
-    import optparse
+    import argparse
 
-    parser = optparse.OptionParser()
-    parser.add_option('-c', '--config', default='/etc/yum/yummie.conf',
-        metavar='FILENAME',
-        help='Configuration file (default: /etc/yum/yummie.conf)')
-    parser.add_option('--no-cache', default=False, action='store_true',
-        help='Do not used cached results (default: use cache)')
-    parser.add_option('--sudo', default=False, action='store_true',
-        help='Use sudo (default: no)')
-    parser.add_option('-u', '--upgrade', default=False, action='store_true',
-        help='Do upgrade (default: no)')
-    parser.add_option('-v', '--verbose', default=False, action='store_true',
-        help='Be verbose (default: no)')
-    parser.add_option('--puppetlock', default=False, action='store_true',
-        help="Wait for the puppet lock and acquire it")
+    parser = argparse.ArgumentParser(description="Automated system upgrades using yum")
+    parser.add_argument(
+        "-c",
+        "--config",
+        default="/etc/yum/yummie.conf",
+        metavar="FILENAME",
+        help="Configuration file (default: /etc/yum/yummie.conf)",
+    )
+    parser.add_argument(
+        "--no-cache",
+        default=False,
+        action="store_true",
+        help="Do not used cached results (default: use cache)",
+    )
+    parser.add_argument(
+        "--sudo", default=False, action="store_true", help="Use sudo (default: no)"
+    )
+    parser.add_argument(
+        "-u",
+        "--upgrade",
+        default=False,
+        action="store_true",
+        help="Do upgrade (default: no)",
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        default=False,
+        action="store_true",
+        help="Be verbose (default: no)",
+    )
+    parser.add_argument(
+        "--puppetlock",
+        default=False,
+        action="store_true",
+        help="Wait for the puppet lock and acquire it",
+    )
 
     # Parse the command line options
-    option, args = parser.parse_args()
+    option = parser.parse_args()
 
     # Setup configuration
     config = Config(option.config)
 
     # Parse default options from configuration file
-    for flag in ('sudo', 'upgrade', 'verbose', 'puppetlock'):
-        if not getattr(option, flag) and config.has_option('yummie', flag):
-            setattr(option, flag, config.getboolean('yummie', flag))
+    for flag in ("sudo", "upgrade", "verbose", "puppetlock"):
+        if not getattr(option, flag) and config.has_option("yummie", flag):
+            setattr(option, flag, config.getboolean("yummie", flag))
 
     # Set verbosity
     logger = logging.getLogger()
@@ -262,11 +288,13 @@ def run():
     # Lock puppet if requested to do so
     if option.puppetlock:
         try:
-            puppetlockfile = config.get('yummie', 'lockfile', '/var/lib/puppet/state/puppetdlock')
+            puppetlockfile = config.getdefault(
+                "yummie", "lockfile", "/var/lib/puppet/state/puppetdlock"
+            )
             while os.path.exists(puppetlockfile):
                 logging.info("Waiting for puppet lock")
                 try:
-                    fd = open(puppetlockfile, 'r')
+                    fd = open(puppetlockfile, "r")
                 except IOError:
                     continue
                 pid = fd.read()
@@ -277,49 +305,50 @@ def run():
                     # pid doesn't exist, lockfile is stale
                     break
                 time.sleep(2)
-            fd = open(puppetlockfile, 'w')
+            fd = open(puppetlockfile, "w")
             fd.write(str(os.getpid()))
             fd.close()
             atexit.register(os.unlink, puppetlockfile)
-        except ConfigParser.NoOptionError:
+        except configparser.NoOptionError:
             pass
 
     yummie = Yummie(option, config)
     yummie.pre()
     updates = yummie.check_updates()
     if updates == 0:
-        logging.info('No updates')
+        logging.info("No updates")
         return 0
 
     elif updates == 1:
-        logging.error('Checking for updates failed:')
+        logging.error("Checking for updates failed:")
         for line in yummie.errors.splitlines():
             logging.error(line.rstrip())
         return 1
 
     if yummie.updates:
-        logging.info('%d packages need updating:' % len(yummie.updates))
+        logging.info("%d packages need updating:" % len(yummie.updates))
         for update, version in sorted(yummie.updates):
-            logging.debug('    %s %s' % (update, version))
+            logging.debug("    %s %s" % (update, version))
 
     else:
-        logging.info('System up to date')
+        logging.info("System up to date")
         return 0
 
     if not option.upgrade:
-        logging.info('Skipping upgrades')
+        logging.info("Skipping upgrades")
         return 0
 
     upgrade = yummie.upgrade([update for update, version in yummie.updates])
     if upgrade == 1:
-        logging.error('There was an error doing the upgrades:')
+        logging.error("There was an error doing the upgrades:")
         for line in yummie.errors.splitlines():
             logging.error(line.rstrip())
         return 1
 
     else:
-        logging.debug('Upgrades done')
+        logging.debug("Upgrades done")
         return yummie.post()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     sys.exit(run())

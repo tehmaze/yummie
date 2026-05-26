@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yummie"
+version = "0.1.10"
+description = "Automated yum upgrades"
+license = "MIT"
+keywords = ["yum", "rpm", "update", "upgrade"]
+requires-python = ">=3.6"
+
+[[project.authors]]
+name = "Wijnand Modderman-Lenstra"
+email = "maze@pyth0n.org"
+
+[project.optional-dependencies]
+dev = ["ruff>=0.15.5", "pylint"]
+
+[tool.setuptools]
+script-files = ["yummie"]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 88
+
+[tool.ruff.lint]
+extend-select = [
+    # pycodestyle (E, W)
+    "E",
+    "W",
+    # Pyflakes (F)
+    "F",
+    # isort (I)
+    "I",
+    # pyupgrade
+    "UP",
+]
+
+[tool.pylint.basic]
+module-naming-style = "any"
+
+[tool.pylint.format]
+max-line-length = 88
+
+[tool.pylint."messages control"]
+disable = [
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    # "consider-using-f-string",
+]
