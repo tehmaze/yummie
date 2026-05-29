@@ -84,7 +84,7 @@ class Yummie:
             logger.addHandler(handler)
 
         else:
-            raise TypeError("Invalid log method: {}".format(method))
+            raise TypeError(f"Invalid log method: {method}")
 
     def _package_args(self):
         return ["--exclude={}".format(",".join(sorted(self.exclude)))]
@@ -95,7 +95,7 @@ class Yummie:
             if option.startswith("exclude"):
                 repos.append(self.config.get("repository", option))
             else:
-                raise ValueError("Unsupported flag in section repository: {}".format(option))
+                raise ValueError(f"Unsupported flag in section repository: {option}")
 
         if len(repos) == 0:
             return ""
