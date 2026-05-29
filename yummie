@@ -294,7 +294,7 @@ def run():
             while os.path.exists(puppetlockfile):
                 logging.info("Waiting for puppet lock")
                 try:
-                    fd = open(puppetlockfile, "r")
+                    fd = open(puppetlockfile, "r", encoding="utf-8")
                 except IOError:
                     continue
                 pid = fd.read()
@@ -305,7 +305,7 @@ def run():
                     # pid doesn't exist, lockfile is stale
                     break
                 time.sleep(2)
-            fd = open(puppetlockfile, "w")
+            fd = open(puppetlockfile, "w", encoding="utf-8")
             fd.write(str(os.getpid()))
             fd.close()
             atexit.register(os.unlink, puppetlockfile)
