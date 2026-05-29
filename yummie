@@ -27,7 +27,7 @@ class Config(configparser.ConfigParser):
             return default
 
 
-class Yummie(object):
+class Yummie:
     _re_package = re.compile(
         r"(?P<package>\S+)\." + r"(?P<arch>:i[3-6]86|x86_64|noarch)"
     )
