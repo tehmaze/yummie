@@ -120,7 +120,7 @@ class Yummie:
             if x == 0:
                 logging.debug(command_text[x])
             else:
-                logging.debug("    " + command_text[x])
+                logging.debug("    %s", command_text[x])
 
         env = os.environ.copy()
         env["COLS"] = "1000"
@@ -188,7 +188,7 @@ class Yummie:
         except configparser.NoOptionError:
             return 0
 
-        logging.info("Running pre script: %s" % (pre))
+        logging.info("Running pre script: %s", pre)
         try:
             args = shlex.split(pre)
             packages = (
@@ -209,7 +209,7 @@ class Yummie:
             return 0
 
         temp = tempfile.NamedTemporaryFile(mode="w")
-        logging.info("Running post script: %s %s" % (post, temp.name))
+        logging.info("Running post script: %s %s", post, temp.name)
         try:
             for line in self.updates:
                 temp.write(" ".join(line))
@@ -326,9 +326,9 @@ def run():
         return 1
 
     if yummie.updates:
-        logging.info("%d packages need updating:" % len(yummie.updates))
+        logging.info("%d packages need updating:", len(yummie.updates))
         for update, version in sorted(yummie.updates):
-            logging.debug("    %s %s" % (update, version))
+            logging.debug("    %s %s", update, version)
 
     else:
         logging.info("System up to date")
