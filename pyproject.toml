@@ -15,7 +15,7 @@ name = "Wijnand Modderman-Lenstra"
 email = "maze@pyth0n.org"
 
 [project.optional-dependencies]
-dev = ["ruff>=0.15.5", "pylint"]
+dev = ["ruff>=0.15.0", "pylint>=4.0"]
 
 [tool.setuptools]
 script-files = ["yummie"]
@@ -23,6 +23,7 @@ script-files = ["yummie"]
 [tool.ruff]
 target-version = "py39"
 line-length = 88
+extend-include = ["yummie"]
 
 [tool.ruff.lint]
 extend-select = [
@@ -36,6 +37,9 @@ extend-select = [
     # pyupgrade
     "UP",
 ]
+ignore = [
+    "E722",   # pycodestyle - bare-except
+]
 
 [tool.pylint.basic]
 module-naming-style = "any"
@@ -48,5 +52,4 @@ disable = [
     "missing-module-docstring",
     "missing-class-docstring",
     "missing-function-docstring",
-    # "consider-using-f-string",
 ]
