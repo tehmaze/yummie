@@ -295,7 +295,7 @@ def run():
                 logging.info("Waiting for puppet lock")
                 try:
                     fd = open(puppetlockfile, encoding="utf-8")
-                except IOError:
+                except OSError:
                     continue
                 pid = fd.read()
                 fd.close()
