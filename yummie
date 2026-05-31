@@ -200,7 +200,7 @@ class Yummie:
                 if package != "":
                     self.exclude.add(package.strip('"'))
         except:
-            exit(1)
+            sys.exit(1)
 
     def post(self):
         try:
