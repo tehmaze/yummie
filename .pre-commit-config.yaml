@@ -14,7 +14,7 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.4
     hooks:
-      # - id: ruff-check
+      - id: ruff-check
       - id: ruff-format
 
   # Bandit is a tool designed to find common security issues in Python code

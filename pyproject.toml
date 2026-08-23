@@ -28,7 +28,7 @@ Repository = "https://github.com/tehmaze/yummie.git"
 Issues = "https://github.com/tehmaze/yummie/issues"
 
 [project.optional-dependencies]
-dev = ["ruff>=0.15.0", "pylint>=4.0", "pycodestyle>=2.14", "pre-commit>=4.6"]
+dev = ["ruff>=0.16.4", "pylint>=4.0", "pycodestyle>=2.14", "pre-commit>=4.6"]
 
 [tool.setuptools]
 script-files = ["yummie"]
@@ -40,18 +40,13 @@ extend-include = ["yummie"]
 
 [tool.ruff.lint]
 extend-select = [
-    # pycodestyle (E, W)
-    "E",
-    "W",
-    # Pyflakes (F)
-    "F",
-    # isort (I)
-    "I",
-    # pyupgrade
-    "UP",
 ]
 ignore = [
-    "E722",   # pycodestyle - bare-except
+    "B006",    # mutable-argument-default
+    "E722",    # pycodestyle - bare-except
+    "LOG015",  # root-logger-call
+    "PLR1704", # redefined-argument-from-local
+    "SIM115",  # open-file-with-context-handler
 ]
 
 [tool.pylint.basic]

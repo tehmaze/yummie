@@ -44,7 +44,7 @@ class Yummie:
         # List of pending packages
         self.updates = []
         # List of excluded packages
-        self.exclude = set([])
+        self.exclude = set()
 
         for option in self.config.options("package"):
             if option.startswith("exclude"):
@@ -116,7 +116,7 @@ class Yummie:
         # Debugging
         logging.debug("Running:")
         command_text = textwrap.wrap(" ".join(command))
-        for x in range(0, len(command_text)):
+        for x in range(len(command_text)):
             if x == 0:
                 logging.debug(command_text[x])
             else:
@@ -178,7 +178,7 @@ class Yummie:
         args.append("update")
         args.extend(packages)
 
-        returncode, output = self._yum(args)
+        returncode, _output = self._yum(args)
         self.updates = []
         return returncode
 
