@@ -28,7 +28,7 @@ Repository = "https://github.com/tehmaze/yummie.git"
 Issues = "https://github.com/tehmaze/yummie/issues"
 
 [project.optional-dependencies]
-dev = ["ruff>=0.15.0", "pylint>=4.0", "pycodestyle>=2.14"]
+dev = ["ruff>=0.15.0", "pylint>=4.0", "pycodestyle>=2.14", "pre-commit>=4.6"]
 
 [tool.setuptools]
 script-files = ["yummie"]
