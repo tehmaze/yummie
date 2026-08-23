@@ -9,10 +9,23 @@ description = "Automated yum upgrades"
 license = "MIT"
 keywords = ["yum", "rpm", "update", "upgrade"]
 requires-python = ">=3.6"
+readme = "README.md"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+]
 
 [[project.authors]]
 name = "Wijnand Modderman-Lenstra"
 email = "maze@pyth0n.org"
+
+[project.urls]
+Homepage = "https://github.com/tehmaze/yummie"
+Repository = "https://github.com/tehmaze/yummie.git"
+Issues = "https://github.com/tehmaze/yummie/issues"
 
 [project.optional-dependencies]
 dev = ["ruff>=0.15.0", "pylint>=4.0", "pycodestyle>=2.14"]
