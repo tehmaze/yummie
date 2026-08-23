@@ -2,13 +2,11 @@
 
 Automated system upgrades using yum.
 
-
 ## Usage
 
 You can specify options via the command line, use `yummie --help` to see what
 commands are available. Yummie uses an ini-style configuration file, default it
 is installed in `/etc/yum/yummie.conf`.
-
 
 ## Configuration
 
@@ -36,4 +34,4 @@ add:
 
 ## Bugs/Features
 
-You can issue a ticket in GitHub: https://github.com/tehmaze/yummie/issues
+You can issue a ticket in GitHub: <https://github.com/tehmaze/yummie/issues>
