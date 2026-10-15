@@ -208,9 +208,8 @@ class Yummie:
         except configparser.NoOptionError:
             return 0
 
-        temp = tempfile.NamedTemporaryFile(mode="w")
-        logging.info("Running post script: %s %s", post, temp.name)
-        try:
+        with tempfile.NamedTemporaryFile(mode="w") as temp:
+            logging.info("Running post script: %s %s", post, temp.name)
             for line in self.updates:
                 temp.write(" ".join(line))
                 temp.write("\n")
@@ -219,8 +218,6 @@ class Yummie:
             args = shlex.split(post)
             args.append(temp.name)
             return subprocess.call(args)
-        finally:
-            temp.close()
 
 
 def run():
@@ -294,20 +291,18 @@ def run():
             while os.path.exists(puppetlockfile):
                 logging.info("Waiting for puppet lock")
                 try:
-                    fd = open(puppetlockfile, encoding="utf-8")
+                    with open(puppetlockfile, encoding="utf-8") as fd:
+                        pid = fd.read()
                 except OSError:
                     continue
-                pid = fd.read()
-                fd.close()
                 try:
                     os.kill(int(pid), 0)
                 except OSError:
                     # pid doesn't exist, lockfile is stale
                     break
                 time.sleep(2)
-            fd = open(puppetlockfile, "w", encoding="utf-8")
-            fd.write(str(os.getpid()))
-            fd.close()
+            with open(puppetlockfile, "w", encoding="utf-8") as fd:
+                fd.write(str(os.getpid()))
             atexit.register(os.unlink, puppetlockfile)
         except configparser.NoOptionError:
             pass

@@ -48,7 +48,6 @@ ignore = [
     "E722",    # pycodestyle - bare-except
     "LOG015",  # root-logger-call
     "PLR1704", # redefined-argument-from-local
-    "SIM115",  # open-file-with-context-handler
 ]
 
 [tool.pylint.basic]
