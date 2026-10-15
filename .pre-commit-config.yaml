@@ -12,7 +12,7 @@ repos:
 
   # https://docs.astral.sh/ruff/configuration/
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.4
+    rev: v0.17.0
     hooks:
       - id: ruff-check
       - id: ruff-format
