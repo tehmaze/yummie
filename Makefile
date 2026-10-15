@@ -11,11 +11,11 @@ install:
 	install -p -m 0644 yummie.conf.example $(DESTDIR)$(sysconfdir)/yum/yummie.conf
 	@echo "Do not forget to edit /etc/yum/yummie.conf"
 
-test: yummie
-	pycodestyle --ignore=E128 $^
+test: FORMAT_FLAGS = --check
+test: lint format
 
 lint: yummie
 	ruff check $^
 
 format: yummie
-	ruff format $^
+	ruff format $(FORMAT_FLAGS) $^

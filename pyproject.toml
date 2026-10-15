@@ -28,7 +28,7 @@ Repository = "https://github.com/tehmaze/yummie.git"
 Issues = "https://github.com/tehmaze/yummie/issues"
 
 [project.optional-dependencies]
-dev = ["ruff>=0.16.4", "pylint>=4.0", "pycodestyle>=2.14", "pre-commit>=4.6"]
+dev = ["ruff>=0.16.4", "pylint>=4.0", "pre-commit>=4.6"]
 
 [tool.setuptools]
 script-files = ["yummie"]
@@ -40,6 +40,8 @@ extend-include = ["yummie"]
 
 [tool.ruff.lint]
 extend-select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
 ]
 ignore = [
     "B006",    # mutable-argument-default
