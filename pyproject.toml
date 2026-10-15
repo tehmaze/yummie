@@ -45,7 +45,6 @@ extend-select = [
 ]
 ignore = [
     "B006",    # mutable-argument-default
-    "E722",    # pycodestyle - bare-except
     "LOG015",  # root-logger-call
     "PLR1704", # redefined-argument-from-local
 ]

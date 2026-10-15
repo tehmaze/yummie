@@ -199,7 +199,8 @@ class Yummie:
             for package in packages:
                 if package != "":
                     self.exclude.add(package.strip('"'))
-        except:
+        except (ValueError, OSError) as e:
+            logging.error("Pre script failed: %s: %s", pre, e)
             sys.exit(1)
 
     def post(self):
